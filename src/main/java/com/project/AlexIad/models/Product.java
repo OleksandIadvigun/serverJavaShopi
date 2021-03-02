@@ -1,7 +1,8 @@
-package com.project.AlexIad.domain;
+package com.project.AlexIad.models;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(of = {"id"})
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(Views.IdName.class)
     private Long id;
     @JsonView(Views.IdName.class)
@@ -22,14 +23,26 @@ public class Product {
     @JsonView(Views.IdName.class)
     private int amount;
     @JsonView(Views.IdName.class)
-    private int expiration;
+    private int expiration ;
     //@Column(updatable = true )
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonView(Views.IdName.class)
-    private LocalDateTime creationDate;
+    private LocalDateTime creationDate = LocalDateTime.now();
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonView(Views.IdName.class)
     private LocalDateTime overdueDate;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private User user;
 
     public LocalDateTime getOverdueDate() {
         return overdueDate;
@@ -65,6 +78,7 @@ public class Product {
     public void setExpiration(int expiration) {
         this.expiration = expiration;
     }
+
 
 
     public LocalDateTime getCreationDate() {

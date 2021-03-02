@@ -1,8 +1,8 @@
 package com.project.AlexIad.controller;
 
-import com.project.AlexIad.domain.Product;
-import com.project.AlexIad.domain.Views;
-import com.project.AlexIad.repos.ProductRepo;
+import com.project.AlexIad.models.Product;
+import com.project.AlexIad.models.Views;
+import com.project.AlexIad.dao.ProductDAO;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/alarms")
 public class AlarmController {
-    private ProductRepo productRepo;
+    private ProductDAO productDAO;
 
     @Autowired
-    public AlarmController(ProductRepo productRepo) {
-        this.productRepo = productRepo;
+    public AlarmController(ProductDAO productDAO) {
+        this.productDAO = productDAO;
     }
 
     @GetMapping
@@ -29,7 +29,7 @@ public class AlarmController {
     @JsonView(Views.IdName.class)
     public List<Product> findExpiratedProducts() {
         LocalDateTime localDateTime = LocalDateTime.now();
-        List<Product> all = (List<Product>) productRepo.findAll();
+        List<Product> all = (List<Product>) productDAO.findAll();
         List<Product> sortedList = all.stream().sorted(Comparator.comparing(a ->
                 a.getOverdueDate()))
                 .filter(a -> a.getOverdueDate().isBefore(localDateTime) ||
@@ -48,7 +48,7 @@ public class AlarmController {
     public Product create(@RequestBody Product product) {
         product.setCreationDate(LocalDateTime.now());
         product.setOverdueDate(product.getCreationDate().plusDays(product.getExpiration()));
-        return productRepo.save(product);
+        return productDAO.save(product);
     }
 
     @PutMapping("{id}")
@@ -58,14 +58,14 @@ public class AlarmController {
         BeanUtils.copyProperties(product, productFromDB, "id");
         productFromDB.setCreationDate(LocalDateTime.now());
         productFromDB.setOverdueDate(productFromDB.getCreationDate().plusDays(productFromDB.getExpiration()));
-        return productRepo.save(productFromDB);
+        return productDAO.save(productFromDB);
     }
 
 
     @DeleteMapping("{id}")
     public void delete(@PathVariable("id") Product product) {
 
-        productRepo.delete(product);
+        productDAO.delete(product);
     }
 
 }

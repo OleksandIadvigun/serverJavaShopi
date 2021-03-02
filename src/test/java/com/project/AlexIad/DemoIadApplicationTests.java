@@ -1,8 +1,8 @@
 package com.project.AlexIad;
 
 import com.project.AlexIad.controller.AlarmController;
-import com.project.AlexIad.domain.Product;
-import com.project.AlexIad.repos.ProductRepo;
+import com.project.AlexIad.models.Product;
+import com.project.AlexIad.dao.ProductDAO;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +22,7 @@ class DemoIadApplicationTests {
 
     @Test
     public void IsAlarmCorrect() {
-        ProductRepo productRepo = mock(ProductRepo.class);
+        ProductDAO productDAO = mock(ProductDAO.class);
 
         String str = "2016-03-04 11:30:40";
         DateTimeFormatter formatter =
@@ -43,8 +43,8 @@ class DemoIadApplicationTests {
         product4.setCreationDate(LocalDateTime.parse("2020-06-05 10:30:30", formatter));
         productList.add(product4);
 
-        doReturn((Iterable<Product>) productList).when(productRepo).findAll();
-        alarmController = new AlarmController(productRepo);
+        doReturn((Iterable<Product>) productList).when(productDAO).findAll();
+        alarmController = new AlarmController(productDAO);
         List<Product> expected = new ArrayList<>();
         expected.add(product1);
         expected.add(product4);

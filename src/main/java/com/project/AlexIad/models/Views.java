@@ -1,4 +1,4 @@
-package com.project.AlexIad.domain;
+package com.project.AlexIad.models;
 
 public final class Views {
     public interface IdName{}
