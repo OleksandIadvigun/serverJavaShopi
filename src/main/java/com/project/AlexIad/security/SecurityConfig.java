@@ -5,7 +5,6 @@ import com.project.AlexIad.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -16,7 +15,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 @Configuration
@@ -35,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/registration", "auth", "/confirm/*","/download/**").permitAll()
+                .antMatchers("/", "/registration", "auth", "/confirm/*","/download/**","checkloginAndEmail").permitAll()
                 .antMatchers( "/product/**","/shop/**", "/alarms/**", "/addImage").hasRole("USER")
                 .antMatchers("/admin/**").hasRole("ADMIN")
               //  .antMatchers(HttpMethod.OPTIONS,"/product").permitAll()

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/alarms")
+@CrossOrigin
 public class AlarmController {
     private ProductDAO productDAO;
 
@@ -30,6 +31,7 @@ public class AlarmController {
     public List<Product> findExpiratedProducts() {
         LocalDateTime localDateTime = LocalDateTime.now();
         List<Product> all = (List<Product>) productDAO.findAll();
+        all.forEach(System.out::println);
         List<Product> sortedList = all.stream().sorted(Comparator.comparing(a ->
                 a.getOverdueDate()))
                 .filter(a -> a.getOverdueDate().isBefore(localDateTime) ||

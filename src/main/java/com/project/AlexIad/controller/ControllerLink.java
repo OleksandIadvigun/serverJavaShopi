@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
+
 public class ControllerLink {
 
     @GetMapping("/list")
@@ -23,11 +24,14 @@ public class ControllerLink {
         return "alarms";
     }
 
-    @GetMapping("/products")
+    @GetMapping("/product")
     public String info(
             @RequestParam(name = "name", required = false, defaultValue = "user") String name, Model model) {
         model.addAttribute("name", name);
         return "products";
     }
-
+     @GetMapping("/")
+    public String hello (){
+        return "inde";
+}
 }

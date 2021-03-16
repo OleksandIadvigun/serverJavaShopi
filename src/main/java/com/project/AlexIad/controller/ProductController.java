@@ -5,6 +5,8 @@ import com.project.AlexIad.models.Product;
 import com.project.AlexIad.models.Views;
 import com.project.AlexIad.dao.ProductDAO;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.project.AlexIad.services.ProductService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,66 +21,58 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
+@AllArgsConstructor
 @RestController
-@RequestMapping("/product")
-//@CrossOrigin("http://localhost:3000")
+@RequestMapping("/products")
+@CrossOrigin
 public class ProductController {
 
-    private final ProductDAO productDAO;
-
-    @Autowired
-    public ProductController(ProductDAO productDAO) {
-        this.productDAO = productDAO;
-    }
-
+    private ProductService productService;
 
     @GetMapping
     @JsonView(Views.IdName.class)
-//    public List<Product> list
-    public ResponseEntity<List<Product>> list
-            (
-            @RequestParam(name = "name", required = false, defaultValue = "BOSS") String name, Model model) {
-        model.addAttribute("name", name);
-        List<Product> sortedListByCreationDate = productDAO.findAll().stream().sorted(Comparator.comparing(Product::getCreationDate)).collect(Collectors.toList());
-       // return sortedListByCreationDate;
-       // List<Product> productDAOAll = productDAO.findAll();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Access-Control-Allow-Origin", "http://localhost:3000");
-        return new ResponseEntity<List<Product>>(sortedListByCreationDate , HttpStatus.OK);
+    public ResponseEntity<List<Product>> getProductsCurrentUser
+            (@RequestHeader("Authorization") String header){
+        System.out.println("in metod " + header);
+        if(header!=null) {
+            try {
+                List<Product> productsList = productService.getProductsCurrentUser(header);
+                return new ResponseEntity<List<Product>>(productsList, HttpStatus.OK);
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return new ResponseEntity<List<Product>>(HttpStatus.NOT_FOUND);
     }
-
-    @GetMapping("{id}")
-    public Product getOne(@PathVariable("id") long id) {
-        Optional<Product> optional = productDAO.findById(id);
-       return optional.get();
-//        Product productDAOById = productDAO.getOne(id);
-//        return productDAOById;
-    }
-
 
     @PostMapping
-    public Product create(@RequestBody Product product) {
-        product.setCreationDate(LocalDateTime.now());
-        product.setOverdueDate(product.getCreationDate().plusDays(product.getExpiration()));
-        return productDAO.save(product);
+    public ResponseEntity<Product> create(@RequestBody Product product,
+                          @RequestHeader("Authorization") String header  ) {
+        Product addedProduct = productService.addProductInCurrentUser(product, header);
+        if(addedProduct!=null){
+        return  new ResponseEntity<Product>(addedProduct, HttpStatus.OK);
+        }
+        return new ResponseEntity<Product>( HttpStatus.METHOD_NOT_ALLOWED);
     }
 
-    @PutMapping("{id}")
-    public Product update(@PathVariable("id") long id,
-                          @RequestBody Product product) {      // message from user
-
-        Product productDAOById = productDAO.getOne(id);
-        BeanUtils.copyProperties(product, productDAOById, "id");
-        productDAOById.setCreationDate(LocalDateTime.now());
-        productDAOById.setOverdueDate(productDAOById.getCreationDate().plusDays(productDAOById.getExpiration()));
-        return productDAO.save(productDAOById);
+    @PutMapping("/edit")
+    public ResponseEntity<Product> update(@RequestBody Product product,
+                          @RequestHeader("Authorization") String header ) {      // message from user
+        Product editedProduct = productService.editProductInCurrentUser(product, header);
+        if(editedProduct!=null){
+            return  new ResponseEntity<Product>(editedProduct, HttpStatus.OK);
+        }
+        return new ResponseEntity<Product>( HttpStatus.METHOD_NOT_ALLOWED);
     }
 
-    @DeleteMapping("{id}")
-    public void delete(@PathVariable("id") Product product) {
-
-        productDAO.delete(product);
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> delete(@RequestBody Product product,
+                       @RequestHeader("Authorization") String header  ) {
+        System.out.println("IN delete method");
+       if( productService.deleteProductInCurrentUser(product, header)!=null){
+           System.out.println("deleted resp from server");
+           return new ResponseEntity<String>("Deleted!", HttpStatus.OK);
+       }
+        return new ResponseEntity<String>( HttpStatus.METHOD_NOT_ALLOWED);
     }
-
 }
