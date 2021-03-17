@@ -1,5 +1,9 @@
 package com.project.AlexIad.controller;
-
+/**
+ *
+ * @author Alex Iadvigun
+ * @version 1.0
+ */
 import com.project.AlexIad.models.User;
 import com.project.AlexIad.services.UserService;
 import lombok.AllArgsConstructor;
@@ -13,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @CrossOrigin
 public class UserController {
-    private UserService userService;
-    private PasswordEncoder passwordEncoder;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("{id}")
     public ResponseEntity<User> getUser(@PathVariable int id, @RequestHeader("Authorization") String header ){

@@ -1,5 +1,9 @@
 package com.project.AlexIad.dao;
-
+/**
+ *
+ * @author Alex Iadvigun
+ * @version 1.0
+ */
 import com.project.AlexIad.models.Shop;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.data.jpa.repository.JpaRepository;

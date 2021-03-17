@@ -1,5 +1,9 @@
 package com.project.AlexIad.services;
-
+/**
+ *
+ * @author Alex Iadvigun
+ * @version 1.0
+ */
 import com.project.AlexIad.dao.UserDAO;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

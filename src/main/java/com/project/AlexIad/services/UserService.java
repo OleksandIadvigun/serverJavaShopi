@@ -1,5 +1,9 @@
 package com.project.AlexIad.services;
-
+/**
+ *
+ * @author Alex Iadvigun
+ * @version 1.0
+ */
 import com.project.AlexIad.exceptions.NotFoundException;
 import com.project.AlexIad.models.Product;
 import com.project.AlexIad.dao.UserDAO;
@@ -37,14 +41,6 @@ public class UserService {
 
 
     public boolean saveUser(User user) {
-        // user.setRole(user.getRole());
-//        try {
-//            List<Product> productList = user.getProducts();
-//            productList.stream().forEach(item -> item.setOverdueDate(
-//                    item.getCreationDate().plusDays(item.getExpiration())));
-//        } catch (NotFoundException e) {
-//            System.out.println(e.getMessage());
-//        }
         user.setActivationCode(UUID.randomUUID().toString());
         if (user.getEmail() != null) {
             String message = String.format("Hello, %s! \n" +

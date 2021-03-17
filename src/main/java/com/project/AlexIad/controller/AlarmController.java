@@ -1,14 +1,21 @@
 package com.project.AlexIad.controller;
-
+/**
+ *
+ * @author Alex Iadvigun
+ * @version 1.0
+ */
 import com.project.AlexIad.models.Product;
 import com.project.AlexIad.models.Views;
 import com.project.AlexIad.dao.ProductDAO;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.project.AlexIad.services.AlarmService;
+import lombok.AllArgsConstructor;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -16,59 +23,28 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/alarms")
+@AllArgsConstructor
 @CrossOrigin
 public class AlarmController {
-    private ProductDAO productDAO;
+    private final AlarmService alarmService;
 
-    @Autowired
-    public AlarmController(ProductDAO productDAO) {
-        this.productDAO = productDAO;
-    }
 
     @GetMapping
     @Test
     @JsonView(Views.IdName.class)
-    public List<Product> findExpiratedProducts() {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        List<Product> all = (List<Product>) productDAO.findAll();
-        all.forEach(System.out::println);
-        List<Product> sortedList = all.stream().sorted(Comparator.comparing(a ->
-                a.getOverdueDate()))
-                .filter(a -> a.getOverdueDate().isBefore(localDateTime) ||
-                        a.getOverdueDate().isEqual(localDateTime))
-                .collect(Collectors.toList());
-        return sortedList;
+    public ResponseEntity<List<Product>> getAlarmsCurrentUser
+            (@RequestHeader("Authorization") String header){
+        if(header!=null) {
+            try {
+                List<Product> productsList = alarmService.getAlarms(header);
+                return new ResponseEntity<List<Product>>(productsList, HttpStatus.OK);
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return new ResponseEntity<List<Product>>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("{id}")
-    public Product getOne(@PathVariable("id") Product product) {
-        return product;
-    }
-
-
-    @PostMapping
-    public Product create(@RequestBody Product product) {
-        product.setCreationDate(LocalDateTime.now());
-        product.setOverdueDate(product.getCreationDate().plusDays(product.getExpiration()));
-        return productDAO.save(product);
-    }
-
-    @PutMapping("{id}")
-    public Product update(@PathVariable("id") Product productFromDB,
-                          @RequestBody Product product) {      // message from user
-
-        BeanUtils.copyProperties(product, productFromDB, "id");
-        productFromDB.setCreationDate(LocalDateTime.now());
-        productFromDB.setOverdueDate(productFromDB.getCreationDate().plusDays(productFromDB.getExpiration()));
-        return productDAO.save(productFromDB);
-    }
-
-
-    @DeleteMapping("{id}")
-    public void delete(@PathVariable("id") Product product) {
-
-        productDAO.delete(product);
-    }
 
 }
 

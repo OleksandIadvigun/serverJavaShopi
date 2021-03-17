@@ -1,10 +1,12 @@
 package com.project.AlexIad.models;
-
-
+/**
+ *
+ * @author Alex Iadvigun
+ * @version 1.0
+ */
 import com.google.gson.annotations.Expose;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import javax.persistence.*;
 
 @Entity
@@ -12,7 +14,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @ToString
 @EntityListeners(AuditingEntityListener.class)
 public class Address extends BaseEntity{

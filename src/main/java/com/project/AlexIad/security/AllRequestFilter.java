@@ -1,5 +1,9 @@
 package com.project.AlexIad.security;
-
+/**
+ *
+ * @author Alex Iadvigun
+ * @version 1.0
+ */
 import com.project.AlexIad.models.User;
 import com.project.AlexIad.services.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,7 +35,6 @@ public class AllRequestFilter extends GenericFilterBean {
         if (header != null) {
             String clearToken = header.substring(7);
             User userFromDB = userService.findUserByToken(clearToken);
-            System.out.println("USER FROM DB with exact token: " + userFromDB);
             if (userFromDB != null) {
                 authentication = new UsernamePasswordAuthenticationToken(userFromDB.getUsername(), null, userFromDB.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);

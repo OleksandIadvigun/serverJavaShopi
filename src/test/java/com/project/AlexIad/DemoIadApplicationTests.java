@@ -3,9 +3,11 @@ package com.project.AlexIad;
 import com.project.AlexIad.controller.AlarmController;
 import com.project.AlexIad.dao.ProductDAO;
 import com.project.AlexIad.models.Product;
+import com.project.AlexIad.services.AlarmService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +25,8 @@ class DemoIadApplicationTests {
     @Test
     public void IsAlarmCorrect() {
         ProductDAO productDAO = mock(ProductDAO.class);
+        AlarmService alarmService = mock(AlarmService.class);
+        String header = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJQaXRlciIsImV4cCI6MTYxODQzNDAwMH0.0quslMA9tqoDYU7Vp_ub2ORxTmB9AhRN44HWx1vZVLAPjZNLqatHWfvKt_HHnE-jES0LiYDVVtmDFzuWHRnUAA";
 
         String str = "2016-03-04 11:30:40";
         DateTimeFormatter formatter =
@@ -47,13 +51,14 @@ class DemoIadApplicationTests {
         product4.setOverdueDate(product4.getCreationDate().plusDays(product4.getExpiration()));
         productList.add(product4);
 
-        doReturn((Iterable<Product>) productList).when(productDAO).findAll();
-        alarmController = new AlarmController(productDAO);
+        doReturn((Iterable<Product>) productList).when(alarmService).getAlarms(header);
+        alarmController = new AlarmController(alarmService);
         List<Product> expected = new ArrayList<>();
         expected.add(product1);
         expected.add(product4);
 
-        List<Product> actual = alarmController.findExpiratedProducts();
+        ResponseEntity <List<Product>> resp = alarmController.getAlarmsCurrentUser(header);
+        List<Product> actual = resp.getBody();
         Assert.assertEquals(expected, actual);
     }
 }

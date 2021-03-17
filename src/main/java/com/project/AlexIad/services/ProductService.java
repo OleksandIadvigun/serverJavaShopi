@@ -1,5 +1,9 @@
 package com.project.AlexIad.services;
-
+/**
+ *
+ * @author Alex Iadvigun
+ * @version 1.0
+ */
 import com.project.AlexIad.dao.ProductDAO;
 import com.project.AlexIad.dao.UserDAO;
 import com.project.AlexIad.models.Product;
@@ -26,11 +30,12 @@ public class ProductService {
         if(header!=null) {
             String clearToken = header.substring(7);
             User userFromDB = userDAO.findUserByToken(clearToken);
-
-            List<Product> prodList = productDAO.findProductsByUserId(userFromDB.getId());
-            List<Product> filteredListByStatus = prodList.stream().filter(product -> product.getStatus().equals(Status.ACTIVE)).collect(Collectors.toList());
-            if(filteredListByStatus!=null) {
-                return filteredListByStatus;
+            if(userFromDB!=null) {
+                List<Product> prodList = productDAO.findProductsByUserId(userFromDB.getId());
+                List<Product> filteredListByStatus = prodList.stream().filter(product -> product.getStatus().equals(Status.ACTIVE)).collect(Collectors.toList());
+                if (filteredListByStatus != null) {
+                    return filteredListByStatus;
+                }
             }
         }
         return null;
@@ -40,14 +45,14 @@ public class ProductService {
         if(header!=null) {
             String clearToken = header.substring(7);
             User userFromDB = userDAO.findUserByToken(clearToken);
-            if(product!=null){
-                product.setUser(userFromDB);
-                product.setCreationDate(LocalDateTime.now());
-                product.setOverdueDate(product.getCreationDate().plusDays(product.getExpiration()));
-                System.out.println(product + " before save pr");
-                productDAO.save(product);
-                System.out.println(product + " after save pr");
-                return product;
+            if(userFromDB!=null) {
+                if (product != null) {
+                    product.setUser(userFromDB);
+                    product.setCreationDate(LocalDateTime.now());
+                    product.setOverdueDate(product.getCreationDate().plusDays(product.getExpiration()));
+                    productDAO.save(product);
+                    return product;
+                }
             }
         }
         return null;
@@ -57,16 +62,18 @@ public class ProductService {
         if(header!=null) {
             String clearToken = header.substring(7);
             User userFromDB = userDAO.findUserByToken(clearToken);
-            if(product!=null){
-                System.out.println(product + " product from request");
-                Product productDAOById = productDAO.getOne(product.getId());
-                System.out.println(productDAOById + " productFromDB");
-                if(productDAOById!=null && productDAOById.getUser().getId()==userFromDB.getId()) {
-                    product.setUpdateDate(LocalDateTime.now());
-                    product.setOverdueDate(product.getUpdateDate().plusDays(product.getExpiration()));
-                    BeanUtils.copyProperties(product, productDAOById,  "id","user","creationDate");
-                    productDAO.save(productDAOById);
-                    return productDAOById;
+            if(userFromDB!=null) {
+                if (product != null) {
+                    System.out.println(product + " product from request");
+                    Product productDAOById = productDAO.getOne(product.getId());
+                    System.out.println(productDAOById + " productFromDB");
+                    if (productDAOById != null && productDAOById.getUser().getId() == userFromDB.getId()) {
+                        product.setUpdateDate(LocalDateTime.now());
+                        product.setOverdueDate(product.getUpdateDate().plusDays(product.getExpiration()));
+                        BeanUtils.copyProperties(product, productDAOById, "id", "user", "creationDate");
+                        productDAO.save(productDAOById);
+                        return productDAOById;
+                    }
                 }
             }
         }
@@ -78,7 +85,7 @@ public class ProductService {
             String clearToken = header.substring(7);
             User userFromDB = userDAO.findUserByToken(clearToken);
             Product byId = productDAO.getOne(product.getId());
-            if(byId!=null ){
+            if(byId!=null && userFromDB!=null ){
                 if(byId.getUser().getId()==userFromDB.getId()) {
                     System.out.println(byId + " prod from db before del");
                     byId.setStatus(Status.DELETED);

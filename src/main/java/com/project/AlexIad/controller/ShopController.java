@@ -1,8 +1,11 @@
 package com.project.AlexIad.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.project.AlexIad.models.Product;
 import com.project.AlexIad.models.Shop;
 import com.project.AlexIad.dao.ShopDAO;
 import com.project.AlexIad.models.User;
+import com.project.AlexIad.models.Views;
 import com.project.AlexIad.services.ShopService;
 import com.project.AlexIad.services.UserService;
 import lombok.AllArgsConstructor;
@@ -20,54 +23,47 @@ import java.util.List;
 @AllArgsConstructor
 @CrossOrigin
 public class ShopController {
-
     private final ShopService shopService;
-    private final UserService userService;
 
-    @GetMapping()
-    public ResponseEntity<List<Shop>> list(@RequestHeader("Authorization") String header) {
-        List<Shop> shopsByUserId = shopService.getShopsByUserId( header);
-        if (shopsByUserId != null) {
-            return new ResponseEntity<List<Shop>>(shopsByUserId, HttpStatus.OK);
+    @GetMapping
+//    @JsonView(Views.ShopView.class)
+    public ResponseEntity<List<Shop>> getProductsCurrentUser
+            (@RequestHeader("Authorization") String header) {
+        if (header != null) {
+            List<Shop> productsList = shopService.getShopsByUserId(header);
+            if (productsList != null) {
+                return new ResponseEntity<List<Shop>>(productsList, HttpStatus.OK);
+            }
         }
         return new ResponseEntity<List<Shop>>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("{userId}/{id}")
-    public ResponseEntity<Shop> getOne(@PathVariable("userId") int UserId,
-                                       @PathVariable("id") long id,
-                                       @RequestHeader("Authorization") String header) {
-        Shop shopById = shopService.getShopById(UserId, id, header);
-        if (shopById != null) {
-            return new ResponseEntity<Shop>(shopById, HttpStatus.OK);
+    @PostMapping
+    public ResponseEntity<Shop> create(@RequestBody Shop shop,
+                                          @RequestHeader("Authorization") String header  ) {
+        Shop addedShop = shopService.addShopInCurrentUser(shop, header);
+        if(addedShop!=null){
+            return  new ResponseEntity<Shop>(addedShop, HttpStatus.OK);
         }
-        return new ResponseEntity<Shop>(HttpStatus.FORBIDDEN);
+        return new ResponseEntity<Shop>( HttpStatus.METHOD_NOT_ALLOWED);
     }
 
-//    @PostMapping
-//    public Shop create(@RequestBody Shop shop, @RequestHeader("Authorization") String header) {
-//        shop.setCreationDate(LocalDateTime.now());
-//        if (header != null) {
-//            System.out.println("header From Rec: " + header);
-//            String clearToken = header.substring(7);
-//            User userFromDB = userService.findUserByToken(clearToken);
-//            shop.setUser(userFromDB);
-//        }
-//        return shopDAO.save(shop);
-//    }
+    @PutMapping("/edit")
+    public ResponseEntity<Shop> update(@RequestBody Shop shop,
+                                          @RequestHeader("Authorization") String header ) {      // message from user
+        Shop editedShop = shopService.editShopInCurrentUser(shop, header);
+        if(editedShop!=null){
+            return  new ResponseEntity<Shop>(editedShop, HttpStatus.OK);
+        }
+        return new ResponseEntity<Shop>( HttpStatus.METHOD_NOT_ALLOWED);
+    }
 
-//    @PutMapping("{id}")
-//    public Shop update(@PathVariable("id") Shop shopFromDB,
-//                       @RequestBody Shop shop) {      // message from user
-//
-//        BeanUtils.copyProperties(shop, shopFromDB, "id", "user");
-//        return shopDAO.save(shopFromDB);
-//    }
-//
-//    @DeleteMapping("{id}")
-//    public void delete(@PathVariable("id") Shop shop) {
-//
-//        shopDAO.delete(shop);
-//    }
-
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> delete(@RequestBody Shop shop,
+                                         @RequestHeader("Authorization") String header  ) {
+        if( shopService.deleteProductInCurrentUser(shop, header)!=null){
+            return new ResponseEntity<String>("Deleted!", HttpStatus.OK);
+        }
+        return new ResponseEntity<String>( HttpStatus.METHOD_NOT_ALLOWED);
+    }
 }

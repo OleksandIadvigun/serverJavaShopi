@@ -1,6 +1,9 @@
 package com.project.AlexIad.services;
-
-
+/**
+ *
+ * @author Alex Iadvigun
+ * @version 1.0
+ */
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -16,7 +19,6 @@ import javax.mail.internet.MimeMessage;
 @AllArgsConstructor
 @PropertySource("classpath:application.properties")
 public class MailSenderService {
-
 
     private JavaMailSender javaMailSender;
     private Environment env;
@@ -35,6 +37,5 @@ public class MailSenderService {
             e.printStackTrace();
         }
         javaMailSender.send(mimeMessage);
-
     }
 }

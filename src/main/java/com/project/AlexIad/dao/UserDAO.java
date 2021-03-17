@@ -1,5 +1,9 @@
 package com.project.AlexIad.dao;
-
+/**
+ *
+ * @author Alex Iadvigun
+ * @version 1.0
+ */
 import com.project.AlexIad.models.User;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-
 
 @EnableJdbcRepositories
 public interface UserDAO extends JpaRepository<User, Long> {
