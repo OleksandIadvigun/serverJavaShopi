@@ -45,6 +45,20 @@ public class AlarmController {
         return new ResponseEntity<List<Product>>(HttpStatus.NOT_FOUND);
     }
 
+    @PutMapping("/done")
+    public ResponseEntity<Product> UpdateAlarmsCurrentUser
+            (@RequestHeader("Authorization") String header,
+             @RequestBody Product product){
+        if(header!=null) {
+            try {
+                Product productsList = alarmService.upDateOverdueDateInProduct(product,header);
+                return new ResponseEntity<Product>(productsList, HttpStatus.OK);
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+        return new ResponseEntity<Product>(HttpStatus.NOT_FOUND);
+    }
 
 }
 
