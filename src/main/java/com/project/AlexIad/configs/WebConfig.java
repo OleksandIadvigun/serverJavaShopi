@@ -14,12 +14,6 @@ import java.nio.file.Path;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/**")
-//                .allowedOrigins("http://localhost:3000")
-//                .allowedMethods("*");
-//    }
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -31,9 +25,10 @@ public class WebConfig implements WebMvcConfigurer {
 
         String home = System.getProperty("user.home");
         String pathImage = "File:" + home + File.separator + "imagesFromServer" + File.separator;
-        String path = new File("src/main/resources/static/download/")
+        String path = new File("BOOT-INF/classes/static/download")
                 .getAbsolutePath();
-        String staticPath = "File:"+ path+ File.separator;
+        String staticPath = "File://"+ path+ File.separator;
+        System.out.println(staticPath + "   it s static path!!!!");
 
         registry
                 .addResourceHandler("/image/**")
@@ -41,6 +36,5 @@ public class WebConfig implements WebMvcConfigurer {
         registry
                 .addResourceHandler("/download/**")
                 .addResourceLocations(staticPath);
-
     }
 }

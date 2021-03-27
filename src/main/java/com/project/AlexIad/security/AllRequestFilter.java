@@ -29,6 +29,7 @@ public class AllRequestFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         logger.info("... do filter");
+
         Authentication authentication = null;
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         String header = httpRequest.getHeader(headerTitle);

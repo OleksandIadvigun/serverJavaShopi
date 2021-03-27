@@ -23,12 +23,12 @@ public class MailSenderService {
     private JavaMailSender javaMailSender;
     private Environment env;
 
-    public void send(String email, String message) {
+    public void send(String email, String message, String title) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
         try {
             mimeMessage.setFrom(new InternetAddress(env.getProperty("spring.mail.username")));
-            helper.setSubject("Activation code to account SHOPI APP");
+            helper.setSubject(title);
             helper.setText(message);
             // helper.addAttachment("someAttach", null, "text/plain");
             helper.setTo(email);

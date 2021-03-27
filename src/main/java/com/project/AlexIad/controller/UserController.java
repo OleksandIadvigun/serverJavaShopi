@@ -26,7 +26,7 @@ public class UserController {
         if(userById!=null){
         return new ResponseEntity<User>(userById, HttpStatus.OK);
         }
-      return new ResponseEntity<User>( HttpStatus.NOT_FOUND);
+      return new ResponseEntity<User>( HttpStatus.OK);
     }
     @PutMapping("edit")
     public ResponseEntity<User> editUser(@RequestBody User user,
@@ -36,7 +36,7 @@ public class UserController {
          if(editedUser!=null){
            return  new ResponseEntity<User>(editedUser, HttpStatus.OK);
          }
-         return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+         return new ResponseEntity<User>(HttpStatus.OK);
     }
 }
 

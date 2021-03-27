@@ -54,11 +54,9 @@ public class JwtFilter extends AbstractAuthenticationProcessingFilter {
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
         logger.info("...authentication");
           User userFromRequest = new ObjectMapper().readValue(httpServletRequest.getInputStream(),User.class);
-        System.out.println("USEr from request " + userFromRequest);
         if(userFromRequest!=null){
            User userFromDB = userService.findUserByLogin(userFromRequest.getUsername());   // can use userDetailsServiceImplementation , but redundant , b return entity of UserDetail impl class User
             this.user = userFromDB;
-            System.out.println(userFromDB + "   userFromDB!!!!!!!");
             if(userFromDB!=null){
                 boolean isCorrectPassword = passwordEncoder.matches(userFromRequest.getPassword(), userFromDB.getPassword());
                 System.out.println(" answer from enkoder" + isCorrectPassword);

@@ -1,9 +1,9 @@
 package com.project.AlexIad.services;
 /**
- *
  * @author Alex Iadvigun
  * @version 1.0
  */
+
 import com.project.AlexIad.exceptions.NotFoundException;
 import com.project.AlexIad.models.Product;
 import com.project.AlexIad.dao.UserDAO;
@@ -49,7 +49,8 @@ public class UserService {
                     env.getProperty("mail.hostName"),
                     user.getActivationCode()
             );
-            mailSenderService.send(user.getEmail(), message);
+            String title = "Activation code from SHOPI ";
+            mailSenderService.send(user.getEmail(), message, title);
             userDAO.save(user);
             return true;
         }
@@ -83,7 +84,7 @@ public class UserService {
     }
 
     public User findUserById(int id, String header) {
-        if(header!=null) {
+        if (header != null) {
             String clearToken = header.substring(7);
             User userFromDB = userDAO.findUserByToken(clearToken);
             if (userFromDB.getId() == id) {
@@ -96,12 +97,11 @@ public class UserService {
     public ResponseEntity<String> IsPresentLoginOrEmail(String username, String email) {
         List<User> all = userDAO.findAll();
         try {
-        List<User> anyLogin = all.stream().filter(user -> user.getUsername().equals(username)).collect(Collectors.toList());
+            List<User> anyLogin = all.stream().filter(user -> user.getUsername().equals(username)).collect(Collectors.toList());
             if (anyLogin.size() != 0) {
-                System.out.println("Username is PRESENT!");
                 return new ResponseEntity<String>("Username is already exist!", HttpStatus.OK);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         try {
@@ -109,18 +109,22 @@ public class UserService {
             if (anyEmail.size() != 0) {
                 return new ResponseEntity<String>("Email is already exist!", HttpStatus.OK);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
-    public User editUser(User user, String header){
-        if(header!=null) {
+    public User editUser(User user, String header) {
+        if (header != null) {
             String clearToken = header.substring(7);
             User userFromDB = userDAO.findUserByToken(clearToken);
-            if (userFromDB!=null) {
-                BeanUtils.copyProperties(user, userFromDB, "id","token","shops","products","isActivated");
+            if (userFromDB != null && user.getUsername().equals(userFromDB.getUsername())) {
+                if (userFromDB.getAddress().getCity().equals(user.getAddress().getCity())) {
+                    BeanUtils.copyProperties(user, userFromDB, "id", "token", "shops", "products", "isActivated", "address");
+                } else {
+                    BeanUtils.copyProperties(user, userFromDB, "id", "token", "shops", "products", "isActivated");
+                }
                 userFromDB.setActivated(true);
                 userDAO.save(userFromDB);
                 userFromDB.setPassword("");
@@ -128,6 +132,25 @@ public class UserService {
             }
         }
         return null;
+    }
+
+    public ResponseEntity<String> sendEmailWithNewPassword(String email, String temporaryPassEncoded, String clearPassword) {
+        if (email != null) {
+            User userByEmail = userDAO.findUserByEmail(email);
+            if (userByEmail != null) {
+                userByEmail.setPassword(temporaryPassEncoded);
+                String message = String.format("Hello, %s! \n" +
+                                "Your temporary new password is: %s",
+                        userByEmail.getUsername(),
+                        clearPassword
+                );
+                String title = "Temporary password from SHOPI ";
+                mailSenderService.send(userByEmail.getEmail(), message, title);
+                userDAO.save(userByEmail);
+                return new ResponseEntity<String>("New password has been sent to your email!", HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
 }
 

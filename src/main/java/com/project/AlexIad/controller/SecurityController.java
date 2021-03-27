@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
@@ -36,7 +37,7 @@ public class SecurityController {
     public ResponseEntity<Object> confirm(@PathVariable String code) throws URISyntaxException {
         if (userService.activationAccount(code)) {
             String mes = "Success, your account is activated !";
-            URI reactApp = new URI("http://localhost:3000/confirm/" + code);
+            URI reactApp = new URI("http://shopi-env.eba-sxvimbup.us-east-2.elasticbeanstalk.com/confirm/" + code);  // todo SETTINGS FOR HOSTNAME!!!!!! Attention!
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setLocation(reactApp);
             return new ResponseEntity<>(mes, httpHeaders, HttpStatus.SEE_OTHER);
@@ -48,6 +49,18 @@ public class SecurityController {
     @PostMapping("/checkloginAndEmail")
     public ResponseEntity<String> checkingData(@RequestBody User user) {
         return userService.IsPresentLoginOrEmail(user.getUsername(), user.getEmail());
+    }
+
+
+    @PostMapping("forgotPassword")
+    public ResponseEntity<String> getTemporaryNewPass(@RequestBody User user){
+        if(user!=null){
+
+            String tempPass = UUID.randomUUID().toString().substring(1,8);
+            String encoded = passwordEncoder.encode(tempPass);
+            return userService.sendEmailWithNewPassword(user.getEmail(),encoded, tempPass);
+        }
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
 }
 

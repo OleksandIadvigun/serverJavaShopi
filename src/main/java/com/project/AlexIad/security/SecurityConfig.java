@@ -15,11 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -37,11 +33,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/registration", "auth", "/confirm/*","/download/**","checkloginAndEmail").permitAll()
-                .antMatchers( "/product/**","/shop/**", "/alarms/**", "/addImage").hasRole("USER")
+                .antMatchers("/", "/registration", "/auth", "/confirm/*","/checkloginAndEmail","/forgotPassword","/download/**").permitAll()
+                .antMatchers( "/products/**","/shops/**", "/alarms/**", "/addImage","/user/**").hasRole("USER")
                 .antMatchers("/admin/**").hasRole("ADMIN")
               //  .antMatchers(HttpMethod.OPTIONS,"/product").permitAll()
-             //   .anyRequest().authenticated()
+                .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new AllRequestFilter(userService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtFilter("/auth", authenticationManager(), userDetImp, passwordEncoder, userService), UsernamePasswordAuthenticationFilter.class);
@@ -51,19 +47,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserService userService;
     private PasswordEncoder passwordEncoder;
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://localhost:8080"));
-       // configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.setAllowedMethods(Arrays.asList("HEAD",
-                "GET", "POST", "PUT", "DELETE", "PATCH"));
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
 
 }
 
