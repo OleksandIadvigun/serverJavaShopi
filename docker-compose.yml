@@ -24,7 +24,7 @@ services:
     - ./mysql:/var/lib/mysql
 
   web:
-    image: library/nginx:alpine
+    image: library/nginx:1.18
     ports:
     - 80:80
     links:
